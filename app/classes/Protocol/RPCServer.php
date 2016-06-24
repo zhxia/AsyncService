@@ -9,24 +9,29 @@
 namespace App\Protocol;
 
 
-class RPCServer
+use App\Util\Base;
+use App\Util\Logger;
+
+class RPCServer extends Base
 {
+
     function __construct()
     {
-
     }
 
-    public function onConnect()
+    public function onConnect(\swoole_server $serv, $fd, $from_fd)
     {
-
+        Logger::getInstance()->getLog()->trace('Client connected!');
     }
 
-    public function onReceive()
+    public function onReceive(\swoole_server $serv, $fd, $from_fd, $data)
     {
-
+        echo $data.PHP_EOL;
+        echo substr($data,4);
+        $serv->send($fd,"got");
     }
 
-    public function onClose()
+    public function onClose(\swoole_server $serv, $fd, $from_fd)
     {
 
     }
