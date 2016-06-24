@@ -26,8 +26,7 @@ class RPCServer extends Base
 
     public function onReceive(\swoole_server $serv, $fd, $from_fd, $data)
     {
-        echo $data.PHP_EOL;
-        echo substr($data,4);
+        var_dump($this->unpack($data,true));
         $serv->send($fd,"got");
     }
 
