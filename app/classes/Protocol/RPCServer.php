@@ -26,8 +26,9 @@ class RPCServer extends Base
 
     public function onReceive(\swoole_server $serv, $fd, $from_fd, $data)
     {
-        var_dump($this->unpack($data,true));
-        $serv->send($fd,"got");
+        $request = $this->unpack($data, true);
+        $result = call_user_func_array($request['method'], $request['params']);
+        $serv->send($fd, $this->pack(array('result' => $result)));
     }
 
     public function onClose(\swoole_server $serv, $fd, $from_fd)

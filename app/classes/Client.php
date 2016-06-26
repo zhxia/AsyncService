@@ -32,13 +32,14 @@ class Client extends Base
 
     public function onConnect($cli)
     {
-        $data = array('method' => '', 'params');
+        $data = array('method' => '\App\Service\Common::getTime', 'params'=>array());
         $cli->send($this->pack($data));
     }
 
     public function onReceive($cli, $data)
     {
-        echo $data.PHP_EOL;
+        print_r($this->unpack($data, true));
+        $cli->close();
     }
 
     public function onError($cli)
