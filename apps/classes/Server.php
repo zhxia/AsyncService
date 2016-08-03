@@ -8,12 +8,11 @@
  */
 namespace App;
 
-use App\Protocol\RPCServer;
 use Swoole\Log;
 
 class Server
 {
-    private static $SERVER_NAME = 'RPC';
+    private static $SERVER_NAME;
     private static $server;
     private static $worker_id;
     private static $config;
@@ -28,16 +27,17 @@ class Server
     function __construct($config = array())
     {
         self::$SERVER_NAME = $config['server_name'];
-        self::$server = new \swoole_server('127.0.0.1', 10086, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
-        $this->protocol = new RPCServer();
-        $this->pid_file = '/tmp/' . self::$SERVER_NAME . '.pid';
+        self::$server = new \swoole_server($config['host'], $config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
+        $this->protocol = new \Swoole\Protocol\SOAServer();
+        $this->protocol->server = $this::$server;
+        $this->pid_file = sprintf($config['pid_file'], self::$SERVER_NAME);
         $this->logger = new Log\EchoLog(true);
         self::$config = $config;
     }
 
-    public function run()
+    public function run($config = array())
     {
-        $config = array();
+        $config = array_merge(self::$config['swoole'], $config);
         self::$server->set($config);
         self::$server->on('start', array($this, 'onMasterStart'));
         self::$server->on('shutdown', array($this, 'onMasterShutdown'));
