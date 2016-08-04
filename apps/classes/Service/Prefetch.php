@@ -8,6 +8,8 @@
 
 namespace App\Service;
 
+use App\Log;
+
 ini_set('default_socket_timeout', -1);
 
 class Prefetch
@@ -25,8 +27,9 @@ class Prefetch
         if (empty($params)) {
             return false;
         }
+        Log::trace('Request data arrived:' . var_export($params, true));
         $url = self::buildPrefetchURL($params);
-        self::doHttpRequest($url);
+        return self::doHttpRequest($url);
     }
 
     private static function doHttpRequest($url)
@@ -34,15 +37,17 @@ class Prefetch
         $URLInfo = self::parseURL($url);
         $shc = new swoole_http_client($URLInfo['host'], $URLInfo['port']);
         $shc->get($URLInfo['path'], function ($cli) use ($url) {
+            Log::trace('Request response:' . $cli->body);
             $key = md5($url);
             $cnt = Prefetch::getValue($key);
             if ($cli->statusCode == 200) {
-                $arrResp = json_decode($cli->body);
-                if (isset($arrResp['code']) && $arrResp['code'] === 0) {
-                    Prefetch::updateData();
+                $resp = json_decode($cli->body);
+                $data = array('url' => $url, 'try_count' => $cnt, 'resp' => $resp);
+                if (isset($resp['code']) && $resp['code'] === 0) {
+                    Prefetch::updateData($data);
                 } else {
                     if ($cnt >= Prefetch::TRY_COUNT) {
-                        Prefetch::updateData();
+                        Prefetch::updateData($data);
                     } else {
                         Prefetch::incrValue($key);
                         Prefetch::doHttpRequest($url);
@@ -51,17 +56,19 @@ class Prefetch
 
             } else {
                 if ($cnt >= Prefetch::TRY_COUNT) {
-                    Prefetch::updateData();
+                    Prefetch::updateData(array('url' => $url, 'try_count' => $cnt));
                 } else {
                     Prefetch::incrValue($key);
                     Prefetch::doHttpRequest($url);
                 }
             }
         });
+        return true;
     }
 
     private static function updateData($data)
     {
+        Log::trace('update data:' . var_export($data, true));
         $key = md5($data['url']);
         unset(self::$counter[$key]); //释放掉 计数器
         $tryCount = (int)$data['try_count'];
