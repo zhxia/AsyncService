@@ -13,11 +13,11 @@ require FRAMEWORK_PATH . '/libs/lib_config.php';
 Swoole\Loader::addNameSpace('App', __DIR__ . '/apps/classes');
 Swoole::$php->config->setPath(__DIR__ . '/configs');
 
-$evn_name = get_cfg_var('env.name');
-if (empty($evn_name)) {
-    $evn_name = 'dev';
+$env_name = get_cfg_var('env.name');
+if (empty($env_name)) {
+    $env_name = 'dev';
 }
-Swoole::$php->config->setPath(__DIR__ . '/configs/' . $evn_name);
+Swoole::$php->config->setPath(__DIR__ . '/configs/' . $env_name);
 $config = Swoole::$php->config['server'];
 //override php.ini configuration
 if (isset($config['php']) && is_array($config['php'])) {

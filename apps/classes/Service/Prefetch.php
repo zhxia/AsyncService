@@ -20,7 +20,7 @@ class Prefetch
      */
     private static $redis = null;
 
-    public static function prefetch($params)
+    public static function doPrefetch($params)
     {
         if (empty($params)) {
             return false;

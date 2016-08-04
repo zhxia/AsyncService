@@ -1,2 +1,2 @@
-logs
-run
+logs/*
+run/*
