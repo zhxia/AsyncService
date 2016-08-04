@@ -18,11 +18,6 @@ class Server
     private static $config;
     private $protocol;
     private $pid_file;
-    /**
-     * @var \Swoole\IFace\Log
-     */
-    private $logger;
-
 
     function __construct($config = array())
     {
@@ -31,7 +26,6 @@ class Server
         $this->protocol = new \Swoole\Protocol\SOAServer();
         $this->protocol->server = $this::$server;
         $this->pid_file = sprintf($config['pid_file'], self::$SERVER_NAME);
-        $this->logger = new Log\EchoLog(true);
         self::$config = $config;
     }
 
@@ -60,7 +54,7 @@ class Server
     {
         \swoole_set_process_name(self::$SERVER_NAME . '-Master');
         file_put_contents($this->pid_file, self::$server->master_pid);
-        $this->logger->trace('master start');
+        \App\Log::trace('master start');
     }
 
     public function onMasterShutdown(\swoole_server $serv)
@@ -68,18 +62,18 @@ class Server
         if (file_exists($this->pid_file)) {
             unlink($this->pid_file);
         }
-        $this->logger->trace('master shutdown');
+        \App\Log::trace('master shutdown');
     }
 
     public function onManagerStart(\swoole_server $serv)
     {
         \swoole_set_process_name(self::$SERVER_NAME . '-Manager');
-        $this->logger->trace('manager start');
+        \App\Log::trace('manager start');
     }
 
     public function onManagerStop(\swoole_server $serv)
     {
-        $this->logger->trace('manager shutdown');
+        \App\Log::trace('manager shutdown');
     }
 
     public function onWorkerStart(\swoole_server $serv, $worker_id)
@@ -94,6 +88,6 @@ class Server
 
     public function onWorkerStop(\swoole_server $serv, $worker_id)
     {
-        Echo $this->logger->trace('worker-' . $worker_id . ' shutdown');
+        \App\Log::trace('worker-' . $worker_id . ' shutdown');
     }
 }

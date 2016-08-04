@@ -16,11 +16,11 @@ class Prefetch
 {
     const SECRET_KEY = '2A7PRWQ1CK0OIVG648NB9FMSHELXD5UJT3YZ';
     const TRY_COUNT = 3;
-    private static $counter = array();
     /**
      * @var \Redis
      */
     private static $redis = null;
+    private static $counter = array();
 
     public static function doPrefetch($params)
     {
@@ -35,13 +35,13 @@ class Prefetch
     private static function doHttpRequest($url)
     {
         $URLInfo = self::parseURL($url);
-        $shc = new swoole_http_client($URLInfo['host'], $URLInfo['port']);
+        $shc = new \swoole_http_client($URLInfo['host'], $URLInfo['port']);
         $shc->get($URLInfo['path'], function ($cli) use ($url) {
-            Log::trace('Request response:' . $cli->body);
             $key = md5($url);
+            Log::trace('Request response:' . $cli->body . ',count:' . var_export(self::$counter, true));
             $cnt = Prefetch::getValue($key);
             if ($cli->statusCode == 200) {
-                $resp = json_decode($cli->body);
+                $resp = json_decode($cli->body, true);
                 $data = array('url' => $url, 'try_count' => $cnt, 'resp' => $resp);
                 if (isset($resp['code']) && $resp['code'] === 0) {
                     Prefetch::updateData($data);
@@ -87,9 +87,9 @@ class Prefetch
             }
         }
         if (self::$redis == null) {
-            $config = \swoole::$php->config['commom'];
+            $config = \swoole::$php->config['common'];
             self::$redis = new \Redis();
-            self::$redis->pconnect($config['redis']['host'], $config['redis']['port'], 5);
+            self::$redis->pconnect($config['redis']['ip'], $config['redis']['port'], 5);
             self::$redis->setOption(\Redis::OPT_READ_TIMEOUT, -1);
         }
         $now = time();
@@ -107,7 +107,7 @@ class Prefetch
         $arrURL = parse_url($url);
         $arr = array(
             'host' => $arrURL['host'],
-            'port' => $arrURL['port'],
+            'port' => isset($arrURL['port']) ? $arrURL['port'] : 80,
             'path' => $arrURL['path']
         );
         if ($arrURL['query']) {
@@ -123,10 +123,10 @@ class Prefetch
 
     public static function incrValue($key)
     {
-        if (isset(self::$counter[$key])) {
-            self::$counter[$key] += 1;
-        } else {
+        if (!isset(self::$counter[$key])) {
             self::$counter[$key] = 1;
+        } else {
+            self::$counter[$key] += 1;
         }
     }
 
