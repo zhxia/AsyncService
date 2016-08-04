@@ -19,8 +19,9 @@ class Log
     private static function format($msg)
     {
         $worker = "";
-        if (\App\Server::$worker_id) {
-            $worker = "worker@" . \APP\Server::$worker_id;
+        $workerId = \App\Server::getWorkerId();
+        if ($workerId) {
+            $worker = "worker@" . $workerId;
         }
         return "pid:" . posix_getpid() . " {$worker} " . implode(',', $msg);
     }

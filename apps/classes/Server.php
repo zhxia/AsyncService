@@ -51,6 +51,11 @@ class Server
         self::$server->start();
     }
 
+    public static function getWorkerId()
+    {
+        return self::$worker_id;
+    }
+
     public function onMasterStart(\swoole_server $serv)
     {
         \swoole_set_process_name(self::$SERVER_NAME . '-Master');
