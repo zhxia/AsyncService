@@ -36,7 +36,7 @@ while (true) {
         'apikey' => 'hefei_ahedt',
         'api' => 'hefei_ahedt',
     );
-    $ret = $cloud->task('App\Service\Prefetch::doPrefetch', $data);
+    $ret = $cloud->task('App\Service\Prefetch::doPrefetch', array($data));
     $cloud->wait(0.01);
     var_dump($ret->getResult());
     sleep(1);
