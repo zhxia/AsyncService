@@ -7,7 +7,7 @@
  * Time: 下午7:24
  */
 define('DEBUG', 'on');
-define('FRAMEWORK_PATH', '/home/zhxia/workspace/php/framework');
+define('FRAMEWORK_PATH', '/data/www/public/framework/');
 define('WEBPATH', __DIR__);
 require FRAMEWORK_PATH . '/libs/lib_config.php';
 Swoole\Loader::addNameSpace('App', __DIR__ . '/apps/classes');
