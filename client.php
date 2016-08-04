@@ -17,7 +17,27 @@ $cloud->setEncodeType(false, true);
 $cloud->putEnv('appKey', 'test1234');*/
 $cloud->addServers(array('127.0.0.1:10086'));
 while (true) {
-    $ret = $cloud->task('App\Service\Common::testRedis');
+    $data = array(
+        'ecode' => 'C18070',
+        'car_model' => '77',
+        'openUDID' => 'b9cc07eab27ea214585d3488709d076a310a7925',
+        'vcode' => 'C18070',
+        'os' => 'iOS',
+        'cartype' => '02',
+        'systemVersion' => '9.3.2',
+        'step' => '3',
+        'carno' => '皖AXT891',
+        'app' => 'QueryViolations',
+        'appChannel' => 'App Store',
+        'cUDID' => 'BE39F37C-2BE9-46AD-8A72-E8DA874A36B1',
+        'appVersion' => '5.9.0',
+        'model' => 'iPhone7,1',
+        '_cityCode' => '0551',
+        'apikey' => 'hefei_ahedt',
+        'api' => 'hefei_ahedt',
+    );
+    $ret = $cloud->task('App\Service\Prefetch::doPrefetch', $data);
     $cloud->wait(0.01);
     var_dump($ret->getResult());
+    sleep(1);
 }
