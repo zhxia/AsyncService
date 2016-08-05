@@ -34,10 +34,10 @@ class Server
             }
             self::$config['host'] = $listenHost;
         }
-        self::$server = new \swoole_server($config['host'], $config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
+        self::$server = new \swoole_server(self::$config['host'], self::$config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
         $this->protocol = new \Swoole\Protocol\SOAServer();
         $this->protocol->server = $this::$server;
-        $this->pid_file = sprintf($config['pid_file'], self::$SERVER_NAME);
+        $this->pid_file = sprintf(self::$config['pid_file'], self::$SERVER_NAME);
 
     }
 
