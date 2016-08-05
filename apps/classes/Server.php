@@ -66,7 +66,7 @@ class Server
     {
         \swoole_set_process_name(self::$SERVER_NAME . '-Master');
         file_put_contents($this->pid_file, self::$server->master_pid);
-        \App\Log::trace('master start');
+        Log::trace('master start');
     }
 
     public function onMasterShutdown(\swoole_server $serv)
@@ -74,18 +74,18 @@ class Server
         if (file_exists($this->pid_file)) {
             unlink($this->pid_file);
         }
-        \App\Log::trace('master shutdown');
+        Log::trace('master shutdown');
     }
 
     public function onManagerStart(\swoole_server $serv)
     {
         \swoole_set_process_name(self::$SERVER_NAME . '-Manager');
-        \App\Log::trace('manager start');
+        Log::trace('manager start');
     }
 
     public function onManagerStop(\swoole_server $serv)
     {
-        \App\Log::trace('manager shutdown');
+        Log::trace('manager shutdown');
     }
 
     public function onWorkerStart(\swoole_server $serv, $worker_id)
@@ -100,6 +100,6 @@ class Server
 
     public function onWorkerStop(\swoole_server $serv, $worker_id)
     {
-        \App\Log::trace('worker-' . $worker_id . ' shutdown');
+        Log::trace('worker-' . $worker_id . ' shutdown');
     }
 }
