@@ -22,11 +22,23 @@ class Server
     function __construct($config = array())
     {
         self::$SERVER_NAME = $config['server_name'];
+        self::$config = $config;
+        if (!isset(self::$config['host'])) {
+            $listenHost = '127.0.0.1';
+            $ipList = swoole_get_local_ip();
+            foreach ($ipList as $ip) {
+                if (strpos($ip, '192.168') === 0 || strpos($ip, '172.16') === 0) {
+                    $listenHost = $ip;
+                    break;
+                }
+            }
+            self::$config['host'] = $listenHost;
+        }
         self::$server = new \swoole_server($config['host'], $config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
         $this->protocol = new \Swoole\Protocol\SOAServer();
         $this->protocol->server = $this::$server;
         $this->pid_file = sprintf($config['pid_file'], self::$SERVER_NAME);
-        self::$config = $config;
+
     }
 
     public function run($config = array())
